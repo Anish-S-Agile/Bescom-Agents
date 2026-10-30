@@ -1,0 +1,355 @@
+/* Shared UI primitives: icon buttons, buttons, inputs, cards, chips, tabs - BESCOM liquid glass styling */
+
+/* ---- Liquid glass surface helper: anything that floats gets blur + specular hairline + soft shadow ---- */
+.card,
+.tab-group {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: box-shadow 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+/* Browsers without backdrop-filter get solid surfaces */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card, .tab-group, .app-nav { background: var(--glass-strong); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .card, .tab-group, .app-nav {
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease), color 0.2s var(--ease);
+}
+.icon-btn:hover {
+  background: var(--hover);
+  color: var(--primary);
+}
+.icon-btn:active {
+  transform: scale(0.92);
+}
+.card .icon-btn {
+  color: var(--text-primary);
+}
+.card .icon-btn:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: 600 14px/1 var(--font);
+  letter-spacing: -0.012em;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s var(--spring), box-shadow 0.2s var(--ease), background 0.2s var(--ease),
+    opacity 0.2s var(--ease), filter 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.btn .material-icons {
+  font-size: 19px;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.btn:disabled, .fab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Primary Button: Radiant BESCOM Electric Blue with liquid glass sheen */
+.btn-primary {
+  color: #ffffff;
+  background: linear-gradient(180deg, #0099ff 0%, #0084d6 52%, #006eb8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.18),
+    0 6px 18px -4px rgba(0, 132, 214, 0.55),
+    0 2px 6px rgba(0, 72, 136, 0.2);
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.18),
+    0 10px 28px -4px rgba(0, 132, 214, 0.72),
+    0 4px 10px rgba(0, 72, 136, 0.25);
+}
+
+.btn-accent {
+  background: linear-gradient(180deg, #38bdf8 0%, var(--accent) 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 18px -4px rgba(0, 180, 216, 0.5);
+}
+.btn-warn {
+  background: linear-gradient(180deg, #f87171 0%, var(--warn) 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 18px -4px rgba(239, 68, 68, 0.45);
+}
+
+/* Stroked / Glass Button */
+.btn-stroked {
+  color: var(--primary);
+  background: var(--glass-soft);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    0 2px 8px rgba(0, 72, 136, 0.08);
+}
+.btn-stroked:hover:not(:disabled) {
+  background: var(--glass-strong);
+  color: var(--primary-dark);
+  border-color: rgba(0, 132, 214, 0.4);
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.8),
+    0 4px 16px rgba(0, 132, 214, 0.2);
+}
+
+.fab {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #0099ff 0%, #0084d6 52%, #006eb8 100%);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    0 8px 24px -4px rgba(0, 132, 214, 0.6);
+  transition: transform 0.2s var(--spring), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
+}
+.fab:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+    0 12px 30px -4px rgba(0, 132, 214, 0.75);
+}
+.fab:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Liquid Glass Text Input */
+.text-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  font: 400 15px var(--font);
+  letter-spacing: -0.011em;
+  color: var(--text-primary);
+  background: var(--field-bg);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+}
+.text-input::placeholder {
+  color: var(--text-tertiary);
+}
+.text-input:hover {
+  border-color: rgba(0, 132, 214, 0.4);
+}
+.text-input:focus {
+  border-color: var(--primary);
+  background: var(--glass-strong);
+  box-shadow:
+    0 0 0 4px var(--primary-ring),
+    0 4px 16px -2px rgba(0, 132, 214, 0.16);
+}
+.text-input:disabled {
+  opacity: 0.55;
+}
+select.text-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%230084d6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-left: 2px;
+  letter-spacing: -0.01em;
+}
+
+.card {
+  color: var(--text-primary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  position: relative;
+}
+.card:hover {
+  border-color: var(--glass-border);
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-header .card-title {
+  margin-bottom: 0;
+}
+.card-actions {
+  margin-top: 14px;
+}
+.card h4 {
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+.card p {
+  margin: 6px 0;
+}
+.mt-8 {
+  margin-top: 8px;
+}
+
+/* Translucent Glass Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(0, 132, 214, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.chip .material-icons {
+  font-size: 14px;
+}
+.chip-warm {
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--caution);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* Liquid Tabs -> Segmented Glass Control */
+.tab-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.tab-header {
+  display: flex;
+  gap: 4px;
+  margin: 16px 18px 6px;
+  padding: 4px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: rgba(0, 132, 214, 0.08);
+  border: 1px solid rgba(0, 132, 214, 0.12);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.tab-label {
+  flex: 1;
+  height: 36px;
+  padding: 0 18px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font: 600 14px var(--font);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.tab-label:hover {
+  color: var(--text-primary);
+}
+.tab-label.active {
+  color: var(--primary);
+  font-weight: 700;
+  background: var(--glass-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 3px 10px rgba(0, 72, 136, 0.12),
+    0 0 0 1px rgba(0, 132, 214, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-header {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .tab-label.active {
+    color: #38bdf8;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 4px 12px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(0, 163, 255, 0.25);
+  }
+}
+
+.tab-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}

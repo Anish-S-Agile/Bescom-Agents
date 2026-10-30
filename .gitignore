@@ -76,3 +76,7 @@ artifacts/
 data/
 
 .pytest_cache/
+
+# Frontend source that the broad public/ and styles/ rules above would otherwise hide
+!react-frontend/public/
+!react-frontend/src/styles/

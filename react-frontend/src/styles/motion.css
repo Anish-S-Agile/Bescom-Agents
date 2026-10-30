@@ -1,0 +1,167 @@
+/* =====================================================================
+   Motion layer - BESCOM Liquid Glass spring physics & fluid animations.
+   Loaded last so it refines static styles. Uses `backwards` fill so finished
+   animations never pin `transform` and hover/press states keep working.
+   ===================================================================== */
+:root {
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --slide-fast: 0.38s;
+  --slide: 0.55s;
+}
+
+@keyframes slide-up    { from { opacity: 0; transform: translateY(22px); } }
+@keyframes slide-down  { from { opacity: 0; transform: translateY(-20px); } }
+@keyframes slide-right { from { opacity: 0; transform: translateX(34px); } }   /* arrives from right */
+@keyframes slide-left  { from { opacity: 0; transform: translateX(-34px); } }  /* arrives from left */
+
+/* ---- app chrome ---- */
+.app-nav {
+  animation: slide-down var(--slide) var(--spring) backwards;
+}
+.app-nav nav a {
+  position: relative;
+}
+
+/* ---- page entrances ---- */
+.assistant-head {
+  animation: slide-up var(--slide) var(--spring) backwards;
+}
+.assistant-page .tab-group {
+  animation: slide-up var(--slide) 0.08s var(--spring) backwards;
+}
+.auth-card, .register-container {
+  animation: slide-up var(--slide) var(--spring) backwards;
+}
+.admin-grid .card {
+  animation: slide-up var(--slide) var(--spring) backwards;
+}
+.admin-grid .card:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.assistant-page > .history-table-wrap,
+.assistant-page > .form-error,
+.assistant-page > p {
+  animation: slide-up var(--slide) 0.14s var(--spring) backwards;
+}
+
+.status-pill {
+  animation: slide-down var(--slide-fast) var(--spring) backwards;
+}
+.status-pill:nth-child(2) { animation-delay: 0.05s; }
+.status-pill:nth-child(3) { animation-delay: 0.1s; }
+.status-pill:nth-child(4) { animation-delay: 0.15s; }
+
+/* ---- tabs: liquid glass thumb glides between segments ---- */
+.tab-header {
+  position: relative;
+  isolation: isolate;
+}
+.tab-header::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px - (var(--n, 3) - 1) * 4px) / var(--n, 3));
+  border-radius: 12px;
+  background: var(--glass-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 3px 10px rgba(0, 72, 136, 0.12),
+    0 0 0 1px rgba(0, 132, 214, 0.15);
+  transform: translateX(calc(var(--i, 0) * (100% + 4px)));
+  transition: transform 0.45s var(--spring);
+}
+@media (prefers-color-scheme: dark) {
+  .tab-header::before {
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 4px 12px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(0, 163, 255, 0.25);
+  }
+}
+.tab-label.active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tab-body {
+  animation: slide-right 0.45s var(--spring) backwards;
+}
+.tab-body[data-direction="backward"] {
+  animation-name: slide-left;
+}
+
+/* ---- chat: messages slide in from their own side ---- */
+.agent-msg-user {
+  animation: slide-right var(--slide-fast) var(--spring) backwards;
+}
+.agent-msg-bot {
+  animation: slide-left var(--slide-fast) var(--spring) backwards;
+}
+.agent-empty {
+  animation: slide-up var(--slide) 0.1s var(--spring) backwards;
+}
+.suggestions .chip-button {
+  animation: slide-up var(--slide) var(--spring) backwards;
+}
+.suggestions .chip-button:nth-child(1) { animation-delay: 0.1s; }
+.suggestions .chip-button:nth-child(2) { animation-delay: 0.16s; }
+.suggestions .chip-button:nth-child(3) { animation-delay: 0.22s; }
+.suggestions .chip-button:nth-child(4) { animation-delay: 0.28s; }
+.preview-card {
+  animation: slide-up var(--slide) 0.1s var(--spring) backwards;
+}
+.quick-replies .btn {
+  animation: slide-up var(--slide-fast) 0.16s var(--spring) backwards;
+}
+.quick-replies .btn + .btn {
+  animation-delay: 0.22s;
+}
+.send-results li {
+  animation: slide-left var(--slide-fast) var(--spring) backwards;
+}
+.send-results li:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+/* ---- lists: rows cascade in ---- */
+.contact-form {
+  animation: slide-left var(--slide) var(--spring) backwards;
+}
+.contact-item, .history-table tbody tr {
+  animation: slide-up var(--slide-fast) var(--spring) backwards;
+}
+.contact-item:nth-child(2), .history-table tbody tr:nth-child(2) { animation-delay: 0.04s; }
+.contact-item:nth-child(3), .history-table tbody tr:nth-child(3) { animation-delay: 0.08s; }
+.contact-item:nth-child(4), .history-table tbody tr:nth-child(4) { animation-delay: 0.12s; }
+.contact-item:nth-child(5), .history-table tbody tr:nth-child(5) { animation-delay: 0.16s; }
+.contact-item:nth-child(6), .history-table tbody tr:nth-child(6) { animation-delay: 0.2s; }
+.contact-item:nth-child(n + 7), .history-table tbody tr:nth-child(n + 7) { animation-delay: 0.24s; }
+
+/* ---- toast slide ---- */
+.toast {
+  animation: toast-slide 0.45s var(--spring) backwards;
+}
+@keyframes toast-slide {
+  from { opacity: 0; transform: translate(-50%, -36px) scale(0.96); }
+}
+
+/* ---- all interactive surfaces glide between states ---- */
+.btn, .icon-btn, .chip-button, .tab-label, .app-nav nav a, .contact-item, .text-input, .status-pill {
+  transition-timing-function: var(--spring);
+}
+.btn, .icon-btn, .chip-button, .contact-item {
+  transition-duration: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
