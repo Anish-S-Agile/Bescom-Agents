@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+  - name: Agents DB
+    uid: agents-postgres
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: postgres:5432
+    user: grafana_ro                  # read-only; can only SELECT from the metrics_* tables
+    isDefault: true
+    jsonData:
+      database: ${POSTGRES_DB}
+      sslmode: disable                # traffic stays on the compose network
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: ${GRAFANA_RO_PASSWORD}

@@ -1,0 +1,29 @@
+# Keep the build context small and free of secrets
+.git
+.gitignore
+.venv/
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+
+# secrets / local config (compose passes .env at runtime; it must never be baked into the image)
+.env
+.env.*
+!.env.example
+react-frontend/.env*
+
+# frontend build inputs are re-created inside the image
+react-frontend/node_modules/
+react-frontend/dist/
+
+# local data, tests and old material
+data/
+tests/
+backup/
+backups/
+metadata/
+misc/
+scripts/
+logo.jpg*
+*.md
+!react-frontend/README.md

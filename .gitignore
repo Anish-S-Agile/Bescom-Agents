@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Angular / Frontend builds
+**/dist/
+**/.angular/
+
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Logs
+*.log
+
+volumes/
+
+milvus_data/
+!.env.example
+postgres_data/
+open-webui-data/
+redis_data/
+outputs/
+minio_data/
+
+test_connection.py
+test_real_images.py
+test_postgres.py 
+
+query
+temp/
+nginx/
+etcd_data/
+postgres_data/
+
+# Runtime directories
+logs/
+uploads/
+outputs/
+backups/
+
+# Build artifacts (should not be committed)
+angular-frontend/dist/
+user-frontend/dist/
+
+# Docker volumes
+*_data/
+backups/
+logs/
+ragbot.db 
+uploads/
+public/
+ssl/
+styles/
+backend/
+angular-frontend/package-lock.json 
+user-frontend/package-lock.json
+
+backup/
+artifacts/
+# Fake postgres (test/dev database)
+data/
+
+.pytest_cache/

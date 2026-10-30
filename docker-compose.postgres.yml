@@ -1,0 +1,71 @@
+# Override that swaps the fake postgres for a REAL PostgreSQL and adds Grafana monitoring.
+# Use after testing on the fake:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.postgres.yml up --build
+#
+# Set POSTGRES_PASSWORD, GRAFANA_RO_PASSWORD and GRAFANA_ADMIN_PASSWORD in .env first (letters and digits only,
+# or URL-encode them: the postgres one is embedded in a URL).
+# For production also set in .env: ENVIRONMENT=production, JWT_SECRET_KEY, ALLOW_REGISTRATION=false,
+# AGENT_DRY_RUN=false and the SMTP / WhatsApp credentials (see .env.example).
+#
+# Grafana: http://localhost:3001 (admin / GRAFANA_ADMIN_PASSWORD) -> Dashboards -> Bescom.
+# It reads the app's metrics_* tables through a read-only role; there is no Prometheus.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agents}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-agents}
+      GRAFANA_RO_PASSWORD: ${GRAFANA_RO_PASSWORD:?Set GRAFANA_RO_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Creates the read-only grafana_ro role the first time the data volume is initialised.
+      - ./grafana/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-agents} -d $${POSTGRES_DB:-agents}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # No published port: only the app and Grafana containers can reach the database.
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AGENT_DB_MODE: postgres          # refuse to start without the real database
+      AGENT_DATABASE_URL: postgresql://${POSTGRES_USER:-agents}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-agents}
+      FAKE_POSTGRES_SEED: "false"      # never seed demo users into a real database
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-2}
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/agents-monitoring.json
+      # expanded inside grafana/provisioning/datasources/agents-postgres.yml
+      POSTGRES_DB: ${POSTGRES_DB:-agents}
+      GRAFANA_RO_PASSWORD: ${GRAFANA_RO_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:
+    name: messaging-agents_postgres_data   # keeps the existing data volume after the project rename
+  grafana_data:

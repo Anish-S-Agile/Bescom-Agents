@@ -1,0 +1,80 @@
+# Testing stack: API + React UI on the FAKE postgres (SQLite on a volume), senders in dry-run by default.
+#
+#   docker compose up --build                       # Ollama already running on your machine (port 11434)
+#   OLLAMA_URL_IN_DOCKER=http://ollama:11434 docker compose --profile ollama up --build   # Ollama + mistral in compose
+#
+# Open http://localhost:8000  (demo login: demo / demo123, admin / admin123 - fake postgres seed)
+# Real Postgres next:  docker compose -f docker-compose.yml -f docker-compose.postgres.yml up --build
+name: bescom
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bescom:local
+    env_file: .env
+    environment:
+      # Compose-specific overrides of .env (the paths below only exist inside the container)
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      # Database follows .env: fake (default here) | auto | postgres. A PostgreSQL on the VM / another host needs no
+      # override file: set AGENT_DB_MODE=postgres + AGENT_DATABASE_URL (or AGENT_DB_HOST/PORT/NAME/USER/PASSWORD).
+      # A "localhost" database host is mapped to the Docker host automatically (see app/services/runtime_env.py).
+      AGENT_DB_MODE: ${AGENT_DB_MODE:-fake}
+      FAKE_POSTGRES_URL: sqlite:////app/data/fake_postgres.db
+      FAKE_POSTGRES_SEED: ${FAKE_POSTGRES_SEED:-true}
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-1}   # keep 1 on the fake postgres (a single SQLite file); more is fine on PostgreSQL
+      RUNNING_IN_DOCKER: "true"
+      PORT: "8000"
+      # Ollama on the Docker host by default. (.env's OLLAMA_BASE_URL=localhost is for running without Docker.)
+      # With --profile ollama set OLLAMA_URL_IN_DOCKER=http://ollama:11434
+      OLLAMA_BASE_URL: ${OLLAMA_URL_IN_DOCKER:-http://host.docker.internal:11434}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - fake_postgres_data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    # reach Ollama on the Docker host (Linux needs this line)
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health/readiness', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    read_only: true                 # the container filesystem is immutable ...
+    tmpfs:
+      - /tmp                        # ... except scratch space and the data volume above
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # ----- optional: Ollama inside compose (profile "ollama") -----
+  ollama:
+    profiles: ["ollama"]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # GPU (NVIDIA): add under this service ->  deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
+
+  ollama-pull:
+    profiles: ["ollama"]
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull", "${ORCHESTRATOR_OLLAMA_MODEL:-mistral}"]
+    restart: "no"
+
+volumes:
+  fake_postgres_data:
+  ollama_models:
